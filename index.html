@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salon Deep - Live App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+</head>
+<body class="bg-gray-100 pb-20">
+
+    <div class="bg-indigo-800 text-white p-6 text-center rounded-b-[40px] shadow-2xl">
+        <h1 class="text-3xl font-black">SALON DEEP</h1>
+        <div class="mt-4 bg-white/10 p-4 rounded-2xl inline-block w-full max-w-[200px]">
+            <p class="text-xs uppercase opacity-70">දැන් කැපෙන අංකය</p>
+            <div id="currentNumber" class="text-5xl font-bold">-</div>
+        </div>
+    </div>
+
+    <div class="p-5 max-w-md mx-auto space-y-6">
+        <div id="customerSection" class="bg-white p-6 rounded-3xl shadow-lg border border-gray-200">
+            <h3 class="font-bold text-gray-700 mb-4">Book Your Slot</h3>
+            <input type="text" id="custName" placeholder="ඔබේ නම" class="w-full p-4 bg-gray-50 rounded-2xl mb-3 outline-none border focus:border-indigo-500">
+            <select id="serviceType" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 outline-none border">
+                <option value="Haircut">Haircut (40min)</option>
+                <option value="Facial">Facial</option>
+                <option value="Hair Color">Hair Color</option>
+                <option value="Shaving">Shaving</option>
+            </select>
+            <button onclick="addBooking()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition">Token එකක් ලබාගන්න</button>
+            <div id="successMsg" class="hidden mt-4 text-center p-3 bg-green-100 text-green-700 rounded-xl font-bold"></div>
+        </div>
+
+        <div id="adminSection" class="hidden space-y-4">
+            <div class="bg-indigo-900 p-5 rounded-3xl text-white shadow-xl">
+                <h3 class="font-bold mb-3 border-b border-white/20 pb-2">ඊළඟට සිටින පිරිස</h3>
+                <div id="adminQueue" class="space-y-3 max-h-64 overflow-y-auto"></div>
+            </div>
+            <button onclick="finishNext()" class="w-full bg-green-500 text-white py-4 rounded-2xl font-bold shadow-lg">වැඩේ ඉවරයි - (Finish Job)</button>
+        </div>
+    </div>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-white p-4 flex justify-around shadow-[0_-5px_20px_rgba(0,0,0,0.05)] rounded-t-3xl">
+        <button onclick="showUI('user')" class="flex flex-col items-center text-indigo-600"><i class="fas fa-cut"></i><span class="text-[10px]">Booking</span></button>
+        <button onclick="loginAdmin()" class="flex flex-col items-center text-gray-400"><i class="fas fa-lock"></i><span class="text-[10px]">Admin</span></button>
+    </div>
+
+    <script>
+        // --- පියවර 3: මෙතනට ඔබේ Firebase Config එක දාන්න ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLDFfRYb3BccfJj7Kd5aCNVO7BkFC_-3o",
+            authDomain: "salondeep-64c06.firebaseapp.com",
+            databaseURL: "https://salondeep-64c06-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "salondeep-64c06",
+            storageBucket: "salondeep-64c06.firebasestorage.app",
+            messagingSenderId: "451577516741",
+            appId: "1:451577516741:web:f579857d8d00ff90d9d6ac"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Real-time Update Numbers
+        db.ref('currentNumber').on('value', (snap) => {
+            document.getElementById('currentNumber').innerText = snap.val() || 0;
+        });
+
+        // Real-time Update Queue for Admin
+        db.ref('queue').on('value', (snap) => {
+            const list = document.getElementById('adminQueue');
+            list.innerHTML = "";
+            const data = snap.val();
+            if(data) {
+                Object.keys(data).forEach(key => {
+                    list.innerHTML += `<div class="bg-white/10 p-3 rounded-xl flex justify-between items-center border border-white/5">
+                        <span>#${data[key].token} - ${data[key].name}</span>
+                        <span class="text-[10px] bg-white/20 px-2 py-1 rounded">${data[key].service}</span>
+                    </div>`;
+                });
+            }
+        });
+
+        async function addBooking() {
+            const name = document.getElementById('custName').value;
+            const service = document.getElementById('serviceType').value;
+            if(!name) return alert("නම ඇතුළත් කරන්න");
+
+            const lastTokenSnap = await db.ref('lastToken').get();
+            let lastToken = (lastTokenSnap.val() || 0) + 1;
+
+            const newBooking = { name, service, token: lastToken };
+            await db.ref('queue').push(newBooking);
+            await db.ref('lastToken').set(lastToken);
+
+            const msg = document.getElementById('successMsg');
+            msg.innerText = "ඔබේ අංකය: " + lastToken;
+            msg.classList.remove('hidden');
+            document.getElementById('custName').value = "";
+        }
+
+        async function finishNext() {
+            const queueSnap = await db.ref('queue').limitToFirst(1).get();
+            const queueData = queueSnap.val();
+            
+            if(queueData) {
+                const key = Object.keys(queueData)[0];
+                const finishedToken = queueData[key].token;
+                
+                await db.ref('currentNumber').set(finishedToken);
+                await db.ref('queue/' + key).remove();
+            } else {
+                alert("පෝලිම හිස්!");
+            }
+        }
+
+        function loginAdmin() {
+            const pass = prompt("Password:");
+            if(pass === "1234") {
+                document.getElementById('customerSection').classList.add('hidden');
+                document.getElementById('adminSection').classList.remove('hidden');
+            }
+        }
+
+        function showUI(type) {
+            if(type === 'user') {
+                document.getElementById('customerSection').classList.remove('hidden');
+                document.getElementById('adminSection').classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
