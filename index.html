@@ -3,53 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salon Deep - Live App</title>
+    <title>Salon Deep | Style & Comfort</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600;800&display=swap');
+        body { font-family: 'Poppins', sans-serif; background: #fdfdfd; }
+        .salon-title { font-family: 'Playfair Display', serif; }
+        .hero-bg {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                        url('https://images.unsplash.com/photo-1574677704207-e03fb4095874?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1NzcxMjV8MHwxfHNlYXJjaHw1OXxzYWxvbiUyMGludGVyaW9yfGVufDB8fHx8MTcwMzYxODU3MXww&ixlib=rb-4.0.3&q=80&w=1080');
+            background-size: cover;
+            background-position: center;
+        }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
-<body class="bg-gray-100 pb-20">
+<body class="pb-24">
 
-    <div class="bg-indigo-800 text-white p-6 text-center rounded-b-[40px] shadow-2xl">
-        <h1 class="text-3xl font-black">SALON DEEP</h1>
-        <div class="mt-4 bg-white/10 p-4 rounded-2xl inline-block w-full max-w-[200px]">
-            <p class="text-xs uppercase opacity-70">දැන් කැපෙන අංකය</p>
-            <div id="currentNumber" class="text-5xl font-bold">-</div>
+    <div class="hero-bg text-white p-8 text-center rounded-b-[50px] shadow-2xl mb-6">
+        <div class="flex justify-center mb-3">
+            <div class="bg-white p-2 rounded-full shadow-lg">
+                <img src="https://cdn-icons-png.flaticon.com/512/2610/2610541.png" alt="Salon Deep Logo" class="w-16 h-16">
+            </div>
+        </div>
+        <h1 class="salon-title text-4xl font-extrabold tracking-tight uppercase">Salon Deep</h1>
+        <p class="text-indigo-200 text-sm mb-6 font-light">Your Style, Our Passion</p>
+        
+        <div class="bg-white/10 backdrop-blur-md rounded-3xl p-4 inline-block w-full max-w-[220px] border border-white/20 fade-in">
+            <p class="text-[10px] uppercase tracking-widest opacity-70">දැන් සේවාව ලබන අංකය</p>
+            <div id="currentNumber" class="text-5xl font-black text-white">0</div>
         </div>
     </div>
 
-    <div class="p-5 max-w-md mx-auto space-y-6">
-        <div id="customerSection" class="bg-white p-6 rounded-3xl shadow-lg border border-gray-200">
-            <h3 class="font-bold text-gray-700 mb-4">Book Your Slot</h3>
-            <input type="text" id="custName" placeholder="ඔබේ නම" class="w-full p-4 bg-gray-50 rounded-2xl mb-3 outline-none border focus:border-indigo-500">
-            <select id="serviceType" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 outline-none border">
-                <option value="Haircut">Haircut (40min)</option>
+    <main class="max-w-md mx-auto px-4">
+        
+        <div id="customerSection" class="bg-white p-6 rounded-3xl shadow-xl space-y-4 fade-in">
+            <h3 class="font-bold text-gray-800 flex items-center mb-4">
+                <i class="fas fa-calendar-alt mr-2 text-indigo-600 text-xl"></i> Online Booking
+            </h3>
+            
+            <input type="text" id="custName" placeholder="ඔබේ නම" 
+                   class="w-full p-4 bg-gray-50 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none transition duration-200">
+            
+            <div class="grid grid-cols-2 gap-3">
+                <input type="date" id="bookDate" class="w-full p-4 bg-gray-50 rounded-2xl border-none ring-1 ring-gray-200 text-sm outline-none transition duration-200">
+                <input type="time" id="bookTime" class="w-full p-4 bg-gray-50 rounded-2xl border-none ring-1 ring-gray-200 text-sm outline-none transition duration-200">
+            </div>
+
+            <select id="serviceType" class="w-full p-4 bg-gray-50 rounded-2xl border-none ring-1 ring-gray-200 outline-none transition duration-200">
+                <option value="Haircut">Haircut (40 min)</option>
                 <option value="Facial">Facial</option>
                 <option value="Hair Color">Hair Color</option>
                 <option value="Shaving">Shaving</option>
+                <option value="Straightening">Straightening</option>
+                <option value="Perming">Perming</option>
+                <option value="Other">Other</option>
             </select>
-            <button onclick="addBooking()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition">Token එකක් ලබාගන්න</button>
-            <div id="successMsg" class="hidden mt-4 text-center p-3 bg-green-100 text-green-700 rounded-xl font-bold"></div>
-        </div>
 
-        <div id="adminSection" class="hidden space-y-4">
-            <div class="bg-indigo-900 p-5 rounded-3xl text-white shadow-xl">
-                <h3 class="font-bold mb-3 border-b border-white/20 pb-2">ඊළඟට සිටින පිරිස</h3>
-                <div id="adminQueue" class="space-y-3 max-h-64 overflow-y-auto"></div>
+            <button onclick="addBooking()" id="bookBtn" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-indigo-800 active:scale-95 transition-all duration-200">
+                Booking එක තහවුරු කරන්න
+            </button>
+
+            <div id="successBox" class="hidden mt-6 p-5 bg-green-50 border-2 border-dashed border-green-200 rounded-3xl text-center fade-in">
+                <i class="fas fa-check-circle text-green-600 text-3xl mb-2"></i>
+                <p class="text-green-800 font-bold">Booking එක සාර්ථකයි!</p>
+                <div class="text-xs text-gray-500 mt-1">ඔබේ අංකය</div>
+                <div id="displayToken" class="text-5xl font-black text-indigo-700 my-1">0</div>
+                <button onclick="sendWhatsAppNotification()" class="mt-3 w-full bg-green-500 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-600 transition-all duration-200">
+                    <i class="fab fa-whatsapp text-xl"></i> WhatsApp විස්තර එවන්න
+                </button>
             </div>
-            <button onclick="finishNext()" class="w-full bg-green-500 text-white py-4 rounded-2xl font-bold shadow-lg">වැඩේ ඉවරයි - (Finish Job)</button>
         </div>
-    </div>
 
-    <div class="fixed bottom-0 left-0 right-0 bg-white p-4 flex justify-around shadow-[0_-5px_20px_rgba(0,0,0,0.05)] rounded-t-3xl">
-        <button onclick="showUI('user')" class="flex flex-col items-center text-indigo-600"><i class="fas fa-cut"></i><span class="text-[10px]">Booking</span></button>
-        <button onclick="loginAdmin()" class="flex flex-col items-center text-gray-400"><i class="fas fa-lock"></i><span class="text-[10px]">Admin</span></button>
-    </div>
+        <div class="grid grid-cols-2 gap-3 mt-6">
+            <img src="https://images.unsplash.com/photo-1596465499252-8285514b8a2e?auto=format&fit=crop&w=400&q=80" alt="Haircut Service" class="rounded-2xl shadow-md h-36 w-full object-cover transform hover:scale-105 transition duration-300">
+            <img src="https://images.unsplash.com/photo-1521590755806-fd9698c179c1?auto=format&fit=crop&w=400&q=80" alt="Facial Service" class="rounded-2xl shadow-md h-36 w-full object-cover transform hover:scale-105 transition duration-300">
+            <img src="https://images.unsplash.com/photo-1603507119047-b2f79ee1229f?auto=format&fit=crop&w=400&q=80" alt="Hair Color Service" class="rounded-2xl shadow-md h-36 w-full object-cover transform hover:scale-105 transition duration-300">
+            <img src="https://images.unsplash.com/photo-1574632007671-b68424268e59?auto=format&fit=crop&w=400&q=80" alt="Shaving Service" class="rounded-2xl shadow-md h-36 w-full object-cover transform hover:scale-105 transition duration-300">
+        </div>
+        
+        <div id="adminSection" class="hidden space-y-4 mt-6">
+            <h3 class="font-bold text-gray-800 px-2 flex justify-between items-center">
+                <span>පෝලිම (Queue)</span>
+                <span id="queueCount" class="bg-indigo-100 text-indigo-600 text-xs px-2 py-1 rounded-lg fade-in">0 Waiting</span>
+            </h3>
+            <div id="adminQueue" class="space-y-3">
+                </div>
+        </div>
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-gray-100 p-4 flex justify-around rounded-t-[30px] shadow-[0_-10px_25px_rgba(0,0,0,0.05)]">
+        <button onclick="showUI('customer')" class="flex flex-col items-center text-indigo-600 transform hover:scale-105 transition duration-200">
+            <i class="fas fa-home text-xl"></i><span class="text-[10px] font-bold mt-1">Home</span>
+        </button>
+        <button onclick="adminLogin()" class="flex flex-col items-center text-gray-400 transform hover:scale-105 transition duration-200">
+            <i class="fas fa-user-shield text-xl"></i><span class="text-[10px] font-bold mt-1">Admin</span>
+        </button>
+    </nav>
 
     <script>
-        // --- පියවර 3: මෙතනට ඔබේ Firebase Config එක දාන්න ---
+        // --- Firebase Config (ඔබ ලබාදුන් දත්ත) ---
         const firebaseConfig = {
             apiKey: "AIzaSyBLDFfRYb3BccfJj7Kd5aCNVO7BkFC_-3o",
             authDomain: "salondeep-64c06.firebaseapp.com",
@@ -60,75 +118,137 @@
             appId: "1:451577516741:web:f579857d8d00ff90d9d6ac"
         };
 
+        const ADMIN_PHONE = "94766299310"; // මෙතනට ඔබේ සැලෝන් එකේ අංකය දාන්න (94 ලෙස පටන් ගන්න)
+
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Real-time Update Numbers
-        db.ref('currentNumber').on('value', (snap) => {
+        let lastBookedDetails = null; // WhatsApp සඳහා අන්තිම booking විස්තර ගබඩා කරයි.
+
+        // 1. Live Listen: Current Service Number
+        db.ref('currentNumber').on('value', snap => {
             document.getElementById('currentNumber').innerText = snap.val() || 0;
         });
 
-        // Real-time Update Queue for Admin
+        // 2. Live Listen: Queue for Admin (and update count)
         db.ref('queue').on('value', (snap) => {
             const list = document.getElementById('adminQueue');
-            list.innerHTML = "";
             const data = snap.val();
+            list.innerHTML = "";
+            let count = 0;
             if(data) {
-                Object.keys(data).forEach(key => {
-                    list.innerHTML += `<div class="bg-white/10 p-3 rounded-xl flex justify-between items-center border border-white/5">
-                        <span>#${data[key].token} - ${data[key].name}</span>
-                        <span class="text-[10px] bg-white/20 px-2 py-1 rounded">${data[key].service}</span>
-                    </div>`;
+                // Sort by date and time
+                const sortedQueue = Object.keys(data).map(key => ({ ...data[key], key })).sort((a, b) => {
+                    const dateTimeA = new Date(`${a.date}T${a.time}`);
+                    const dateTimeB = new Date(`${b.date}T${b.time}`);
+                    return dateTimeA - dateTimeB;
                 });
+
+                sortedQueue.forEach(item => {
+                    count++;
+                    list.innerHTML += `
+                        <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center fade-in">
+                            <div>
+                                <div class="font-bold text-gray-800 text-sm">#${item.token} - ${item.name}</div>
+                                <div class="text-[10px] text-gray-500">${item.date} | ${item.time}</div>
+                                <div class="text-[10px] text-indigo-600 font-semibold">${item.service}</div>
+                            </div>
+                            <button onclick="finishJob('${item.key}', ${item.token})" class="bg-green-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-green-600 transition duration-200">
+                                Finish
+                            </button>
+                        </div>`;
+                });
+            } else {
+                list.innerHTML = `<div class="text-center py-10 text-gray-400 text-xs italic">දැනට පෝලිමේ කිසිවෙකු නැත.</div>`;
             }
+            document.getElementById('queueCount').innerText = count + " Waiting";
         });
 
+        // 3. Add Booking to Firebase (with 40-minute gap check and WhatsApp trigger)
         async function addBooking() {
             const name = document.getElementById('custName').value;
+            const date = document.getElementById('bookDate').value;
+            const time = document.getElementById('bookTime').value;
             const service = document.getElementById('serviceType').value;
-            if(!name) return alert("නම ඇතුළත් කරන්න");
+
+            if(!name || !date || !time) return alert("කරුණාකර සියලු විස්තර පුරවන්න.");
+
+            const newBookingDateTime = new Date(`${date}T${time}`);
+            if(newBookingDateTime < new Date()) return alert("අතීත වේලාවන් සඳහා බුකින් තැබිය නොහැක.");
+
+            const snapshot = await db.ref('queue').get();
+            const existingQueue = snapshot.val();
+            let isOverlap = false;
+
+            if (existingQueue) {
+                Object.values(existingQueue).forEach(b => {
+                    if (b.date === date) { // Check only for bookings on the same day
+                        const existingDateTime = new Date(`${b.date}T${b.time}`);
+                        const diffMins = Math.abs(newBookingDateTime - existingDateTime) / 60000;
+                        if (diffMins < 40) { // 40-minute gap check
+                            isOverlap = true;
+                        }
+                    }
+                });
+            }
+
+            if (isOverlap) {
+                return alert("සමාවෙන්න, මෙම වේලාව දැනටමත් වෙන් කර ඇත හෝ වෙනත් බුකින් එකකට ඉතා සමීපයි. කරුණාකර අවම විනාඩි 40ක පරතරයක් සහිත වෙනත් වේලාවක් තෝරන්න.");
+            }
 
             const lastTokenSnap = await db.ref('lastToken').get();
-            let lastToken = (lastTokenSnap.val() || 0) + 1;
+            let token = (lastTokenSnap.val() || 0) + 1;
 
-            const newBooking = { name, service, token: lastToken };
-            await db.ref('queue').push(newBooking);
-            await db.ref('lastToken').set(lastToken);
+            const entry = { name, date, time, service, token };
+            await db.ref('queue').push(entry);
+            await db.ref('lastToken').set(token);
 
-            const msg = document.getElementById('successMsg');
-            msg.innerText = "ඔබේ අංකය: " + lastToken;
-            msg.classList.remove('hidden');
+            // Store details for WhatsApp
+            lastBookedDetails = entry;
+
+            // Show UI confirmation
+            document.getElementById('displayToken').innerText = token;
+            document.getElementById('successBox').classList.remove('hidden');
             document.getElementById('custName').value = "";
-        }
-
-        async function finishNext() {
-            const queueSnap = await db.ref('queue').limitToFirst(1).get();
-            const queueData = queueSnap.val();
             
-            if(queueData) {
-                const key = Object.keys(queueData)[0];
-                const finishedToken = queueData[key].token;
-                
-                await db.ref('currentNumber').set(finishedToken);
+            document.getElementById('bookBtn').disabled = true; // Disable booking button temporarily
+            document.getElementById('bookBtn').innerText = "Booking Confirmed!";
+        }
+
+        // 4. Send WhatsApp Notification
+        function sendWhatsAppNotification() {
+            if(!lastBookedDetails) return alert("Booking විස්තර නැත.");
+            const msg = `*SALON DEEP BOOKING CONFIRMATION*%0A--------------------------%0A*Token:* ${lastBookedDetails.token}%0A*Name:* ${lastBookedDetails.name}%0A*Date:* ${lastBookedDetails.date}%0A*Time:* ${lastBookedDetails.time}%0A*Service:* ${lastBookedDetails.service}%0A--------------------------%0Aඔබගේ පැමිණීම බලාපොරොත්තු වෙමු. ස්තූතියි!`;
+            window.open(`https://wa.me/${ADMIN_PHONE}?text=${msg}`, '_blank');
+        }
+
+        // 5. Admin Finish Job Function
+        async function finishJob(key, token) {
+            if(confirm(`අංක ${token} සේවාව අවසන් බව සහතිකද?`)) {
+                await db.ref('currentNumber').set(token);
                 await db.ref('queue/' + key).remove();
-            } else {
-                alert("පෝලිම හිස්!");
             }
         }
 
-        function loginAdmin() {
-            const pass = prompt("Password:");
-            if(pass === "1234") {
-                document.getElementById('customerSection').classList.add('hidden');
-                document.getElementById('adminSection').classList.remove('hidden');
-            }
-        }
-
+        // 6. UI Switching & Admin Login
         function showUI(type) {
-            if(type === 'user') {
-                document.getElementById('customerSection').classList.remove('hidden');
-                document.getElementById('adminSection').classList.add('hidden');
+            document.getElementById('customerSection').classList.toggle('hidden', type !== 'customer');
+            document.getElementById('adminSection').classList.toggle('hidden', type !== 'admin');
+            
+            if(type === 'customer') { // Reset customer section on tab switch
+                document.getElementById('bookBtn').disabled = false;
+                document.getElementById('bookBtn').innerText = "Booking එක තහවුරු කරන්න";
+                document.getElementById('successBox').classList.add('hidden');
+                document.getElementById('custName').value = '';
+                document.getElementById('bookDate').value = '';
+                document.getElementById('bookTime').value = '';
             }
+        }
+
+        function adminLogin() {
+            const pass = prompt("Admin Password:");
+            if(pass === "1234") showUI('admin');
+            else if(pass != null) alert("වැරදි මුරපදයක්!");
         }
     </script>
 </body>
